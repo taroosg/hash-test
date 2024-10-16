@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    <label for="str">値</label>
+    <input type="text" id="str">
+  </div>
+  <div>
+    <label for="count">回数</label>
+    <input type="number" id="count" value="10">
+  </div>
+  <div>
+    <button id="start">start</button>
+  </div>
+
+  <ol id="hash_value"></ol>
+
+  <script>
+
+    document.getElementById('start').addEventListener('click', async () => {
+      const count = Number(document.getElementById('count').value);
+      const str = document.getElementById('str').value;
+      const hash = [];
+      if (!count || count < 0 || !str) return false;
+      for (let i = 0; i < count; i++) {
+        hash.push(await digestMessage(hash.length ? hash[hash.length - 1] : str));
+      }
+      document.getElementById('hash_value').innerHTML = hash.map((x) => '<li>' + x + '</li>').join('');
+    });
+
+
+    async function digestMessage(message) {
+      const msgUint8 = new TextEncoder().encode(message);                           // encode as (utf-8) Uint8Array
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);           // hash the message
+      const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+      return hashHex;
+    }
+
+
+  </script>
+</body>
+
+</html>
